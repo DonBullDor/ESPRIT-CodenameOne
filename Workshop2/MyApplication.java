@@ -58,29 +58,20 @@ public class MyApplication {
     }
 
     public void start() {
-        if (current != null) {
-            current.show();
-            return;
-        }
-        UIBuilder ui = new UIBuilder(); //chargeur pour charger le resource forme dans un objet form
-
-        //les registres
+        UIBuilder ui = new UIBuilder();
         UIBuilder.registerCustomComponent("ImageViewer", ImageViewer.class);
         UIBuilder.registerCustomComponent("ComboBox", ComboBox.class);
 
-        //chargement le form
-        Form f1 = ui.createContainer(theme, "GUI 1").getComponentForm();
+        Form mainForm = ui.createContainer(theme, "GUI 1").getComponentForm();
+        Form secondaryForm = ui.createContainer(theme, "profil").getComponentForm();
 
-        Form f2 = ui.createContainer(theme, "profil").getComponentForm();
+        ComboBox teachers = (ComboBox) ui.findByName("comboteach", mainForm);
+        ImageViewer image = (ImageViewer) ui.findByName("Imageteach", secondaryForm);
+        Label note = (Label) ui.findByName("note", secondaryForm);
+        Slider sliderNote = (Slider) ui.findByName("Slider", secondaryForm);
+        Button btn = (Button) ui.findByName("Button", secondaryForm);
 
-        ComboBox teachers = (ComboBox) ui.findByName("comboteach", f1);
-        ImageViewer image = (ImageViewer) ui.findByName("Imageteach", f2);
-        Label note = (Label) ui.findByName("note", f2);
-        Slider sd = (Slider) ui.findByName("Slider", f2);
-        Button btn = (Button) ui.findByName("Button", f2);
-
-        teachers.addActionListener(evt
-                -> {
+        teachers.addActionListener(evt -> {
             String selected = teachers.getSelectedItem().toString();
             if (selected.equals("teacher 1")) {
                 image.setImage(theme.getImage("Picture1.png"));
@@ -90,22 +81,12 @@ public class MyApplication {
                 image.setImage(theme.getImage("Picture3.png"));
             }
 
-            f2.getToolbar().addCommandToSideMenu("Home", null, new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent evt) {
-                    f1.showBack();
-                }
-            });
-            f2.show();
+            secondaryForm.getToolbar().addCommandToSideMenu("Home", null, evt1 -> mainForm.showBack());
+            secondaryForm.show();
         });
-        sd.addActionListener(evt
-                -> {
-            note.setText(sd.getProgress() + "");
-        });
-        btn.addActionListener(evt -> {
-            Dialog.show("NOTE!", "Vous voullez cpnfirmer la note " + sd.getProgress(), "cancel", "ok !!");
-        });
-        f1.show();
+        sliderNote.addActionListener(evt -> note.setText(sliderNote.getProgress() + ""));
+        btn.addActionListener(evt -> Dialog.show("NOTE!", "Confirmer la note " + sliderNote.getProgress(), "cancel", "ok !!"));
+        mainForm.show();
     }
 
     public void stop() {
